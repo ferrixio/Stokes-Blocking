@@ -17,22 +17,32 @@ def SymbolEigenvalues(n: int) -> list[float]:
 if __name__ == "__main__":
 
     # partition of the domain
-    n = 8
+    n = 16
 
     # assemblaggio B_x
-    # zeroEBx, zeroOBx = ZeroColumnBx(n)
-    # secondEBx, secondOBx = SecondColumnBx(n)
-    # Bx, resBx = AssembleB_block(n, zeroEBx, zeroOBx, FirstColumnBx(n), secondEBx, secondOBx, FirstColumnn1Bx(n))
+    zeroEBx, zeroOBx = ZeroColumnBx(n)
+    secondEBx, secondOBx = SecondColumnBx(n)
+    Bx, resBx = AssembleB_block(n, zeroEBx, zeroOBx, FirstColumnBx(n), secondEBx, secondOBx, FirstColumnn1Bx(n))
 
     # assemblaggio B_y
-    # zeroEBy, zeroOBy = ZeroColumnBy(n)
-    # secondEBy, secondOBy = SecondColumnBy(n)
-    # By, resBy = AssembleB_block(n, zeroEBy, zeroOBy, FirstColumnBy(n), secondEBy, secondOBy, FirstColumnn1By(n))
+    zeroEBy, zeroOBy = ZeroColumnBy(n)
+    secondEBy, secondOBy = SecondColumnBy(n)
+    By, resBy = AssembleB_block(n, zeroEBy, zeroOBy, FirstColumnBy(n), secondEBy, secondOBy, FirstColumnn1By(n))
 
-    sing1, sing2 = SymbolEigenvalues(n)
-    xx = np.linspace(0,len(sing1), len(sing1))
+    sing1, sing2 = SymbolEigenvalues(1000)
+    xx = np.linspace(0,1, len(sing1))
+    svd_x = np.linalg.svd(Bx, compute_uv=False)
+    svd_y = np.linalg.svd(By, compute_uv=False)
 
-    plt.semilogy(xx, sing1, '*', xx, sing2, 'x')
-    plt.legend([r'svd sym($B_x$)', r'svd sym($B_y$)'])
+    yy = np.linspace(0,1, len(svd_x))
+
+    plt.figure(1)
+    plt.plot(yy, np.sort(svd_x), '.', xx, sing1)
+    plt.legend([r'SVD $B_{x,n}$', 'Symbol'])
+    
+    plt.figure(2)
+    plt.plot(yy, np.sort(svd_y), '.', xx, sing2)
+    plt.legend([r'SVD $B_{y,n}$', 'Symbol'])
+
     plt.show()
     
