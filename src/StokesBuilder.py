@@ -1011,8 +1011,8 @@ def SuperSymbol(n:int, case:int, gamma:int) ->list[float]:
     for i in np.linspace(-np.pi, np.pi, n):
         for j in np.linspace(-np.pi, np.pi, n):
 
-            sym_Bx = AssembleSymbolBx(i,j,n)
-            sym_By = AssembleSymbolBy(i,j,n)
+            sym_Bx = AssembleSymbolBx(i,j)
+            sym_By = AssembleSymbolBy(i,j)
 
             for x in np.linspace(0,1,n):
                 for y in np.linspace(0,1,n):
@@ -1119,14 +1119,13 @@ def AssembleSymbol_A(x:float, y:float, theta1:float, theta2:float, case:int, gam
 
     return mu(x,y)*G
 
-def AssembleSymbolBx(theta1:float, theta2:float, n:int):
+def AssembleSymbolBx(theta1:float, theta2:float):
     """Function that builds the symbol of the Bx matrix.
     INPUT:
     - a: left side of the domain
     - b: right side of the domain
     - theta1: first variable for the evaluation of the symbol
     - theta2: second variable for the evaluation of the symbol
-    - n: cells number used in the discretization
     """
     from cmath import exp
     G_const = np.zeros((8,2), dtype=np.complex128)
@@ -1163,14 +1162,13 @@ def AssembleSymbolBx(theta1:float, theta2:float, n:int):
     G = G_const + G_mt1*exp(complex(0, -theta1)) + G_mt2*exp(complex(0, -theta2)) + G_mt1t2*exp(complex(0, -(theta1+theta2)))
     return G
 
-def AssembleSymbolBy(theta1:float, theta2:float, n:int):
+def AssembleSymbolBy(theta1:float, theta2:float):
     """Function that builds the symbol of the Bx matrix.
     INPUT:
     - a: left side of the domain
     - b: right side of the domain
     - theta1: first variable for the evaluation of the symbol
     - theta2: second variable for the evaluation of the symbol
-    - n: cells number used in the discretization
     """
     from cmath import exp
     G_const = np.zeros((8,2), dtype=np.complex128)
