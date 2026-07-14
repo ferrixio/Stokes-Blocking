@@ -11,8 +11,7 @@ This repository contains the material used to perform numerical tests of the blo
 
 - `matrices`: contains the colored output of the matrices in .xlsx;
 - `src`: main folder of the methods. `StokesBuilder.py` is the true main file;
-- `tests`: contains the tests regarding PGMRES convergence;
-- `symbol`: contains the tests regarding the adeherence of the spectral distribution to the spectral symbol.
+- `tests`: contains all the tests: eigenvalues adherences, clustering and PGMRES performance;
 
 Python libraries used: numpy, random, math, matplolib, scipy.
 
