@@ -16,8 +16,7 @@ def SymbolEigenvalues(n: int) -> list[float]:
 ## MAIN ##
 if __name__ == "__main__":
 
-    # partition of the domain
-    n = 16
+    n = 24          # partition of the domain
 
     # assemble B_x
     zeroEBx, zeroOBx = ZeroColumnBx(n)
@@ -29,7 +28,7 @@ if __name__ == "__main__":
     secondEBy, secondOBy = SecondColumnBy(n)
     By, resBy = AssembleB_block(n, zeroEBy, zeroOBy, FirstColumnBy(n), secondEBy, secondOBy, FirstColumnn1By(n))
 
-    sing1, sing2 = SymbolEigenvalues(1000)
+    sing1, sing2 = SymbolEigenvalues(2*n)
     xx = np.linspace(0,1, len(sing1))
 
     # compute svd
@@ -39,10 +38,10 @@ if __name__ == "__main__":
 
     plt.figure(1)
     plt.plot(yy, np.sort(svd_x), '.', xx, sing1)
-    plt.legend([r'SVD $B_{x,n}$', 'Symbol'])
+    plt.legend([r'$\sigma_j(B_{x,n})$', '$f(\\theta_1,\\theta_2)$'])
     
     plt.figure(2)
     plt.plot(yy, np.sort(svd_y), '.', xx, sing2)
-    plt.legend([r'SVD $B_{y,n}$', 'Symbol'])
+    plt.legend([r'$\sigma_j(B_{y,n})$', '$f(\\theta_1,\\theta_2)$'])
 
     plt.show()

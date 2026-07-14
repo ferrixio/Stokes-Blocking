@@ -1,11 +1,11 @@
 # Stokes-Blocking
-Repository of the blocking analysis of the Stokes equations
+Repository of the spectral analysis of the Stokes equations with blocking preconditioning
 
-Authors: Samuele Ferri, Valerio Loi
+Authors: Samuele Ferri, Chiara Giraudo, Valerio Loi, Miroslav Kuchta, Stefano Serra-Capizzano
 
 ## Introduction
 
-This repository contains the material used to perform numerical tests of the blocking strategy [1] applied to the matrix sequences arising from the Taylor-Hood $\mathbb{P}_2-\mathbb{P}_1$ approximation of variable viscosity for 2$d$ Stokes problem under weak assumptions on the regularity of the diffusion [2].
+This repository contains the material used to perform numerical tests of the blocking strategy [1] applied to the matrix sequences arising from the Taylor-Hood $\mathbb{P}_2-\mathbb{P}_1$ approximation of variable viscosity for 2$D$ Stokes problem under weak assumptions on the regularity of the diffusion [2].
 
 ### Index of the repository
 

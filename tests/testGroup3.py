@@ -1,75 +1,65 @@
 '''
-COMMENT: Terzo gruppo di test per stokes.
+Group 3: Krylov tests
 
-mu = {
-    gamma in (0,0.5)^2
-    1+x+y altrimenti
+mu(x,y) = {
+    gamma   for (x,y) in (0,0.5)^2
+    1+x+y   otherwise
 }
+with gamma = 1, 10, 100.
 
-con gamma = 1, 10, 100.
+We are testing:
+    1. Clustering of the preconditioners of A_n and B_n
+    2. GMRES convergence
+    3. PGMRES convergence
 
-Vengono testate le seguenti cose:
-    1. Clustering a 1 del precondizionatore di A e di B
-    2. GMRES
-    3. PGMRES
-
-(P)GMRES viene testato su tre sistemi lineari diversi:
+(P)GMRES is tested with the following right-hand sides:
     a. rhs = 1
-    b. rhs = g(t1,t2)*h^2,  dove t1,t2 sono un sampling di [-pi, pi]^2 e h = dx
-    c. rhs = rng(t1,t2),    dove rng è un sampling randomico di [-pi, pi]^2
+    b. rhs = g(t1,t2)*h^2   where t1,t2 are samplings of [-pi, pi]^2 and h = dx
+    c. rhs = rng(t1,t2)     where rng is a random sampling of [-pi, pi]^2
 '''
+
+if __name__ == '__main__':
+    import sys, os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from src.StokesBuilder import *
 
 if __name__ == "__main__":
 
-    n = 8                       # ordine della divisione
+    n = 24                          # order of division
     gamma = 1
-    coeffMu = CreateMu(n, 3, gamma) # ottenimento dei coefficienti di mu
+    coeffMu = CreateMu(n, 3, gamma) # viscosity coefficients
 
 
-    # STEP: creazione matrice A
-    # assemblaggio A_xx
+    # Assembly of matrix A
     A_xx, res = AssembleStiffness(n, *ZeroColumn(n, coeffMu), *SecondColumn(n, coeffMu), *ThirdColumn(n, coeffMu),
                                           *FourthColumn(n, coeffMu), *LastColumn(n, coeffMu), *Centers(n, coeffMu))
 
-    BIG_A = np.kron(np.eye(2), A_xx)    # assemblaggio A
+    BIG_A = np.kron(np.eye(2), A_xx)
 
-
-    # STEP: creazione matrice B
-
-    # assemblaggio B_x
+    # Assembly of matrix Bx
     zeroEBx, zeroOBx = ZeroColumnBx(n)
     secondEBx, secondOBx = SecondColumnBx(n)
     Bx, resBx = AssembleB_block(n, zeroEBx, zeroOBx, FirstColumnBx(n), secondEBx, secondOBx, FirstColumnn1Bx(n))
 
-    # assemblaggio B_y
+    # Assembly of matrix By
     zeroEBy, zeroOBy = ZeroColumnBy(n)
     secondEBy, secondOBy = SecondColumnBy(n)
     By, resBy = AssembleB_block(n, zeroEBy, zeroOBy, FirstColumnBy(n), secondEBy, secondOBy, FirstColumnn1By(n))
 
     BIG_B = np.hstack((Bx.T, By.T))
 
-    # assemblaggio matriciona
+    # Final assembly of matrix M
     SUPER_A = np.block([
         [BIG_A, BIG_B.T],
         [BIG_B, np.zeros((BIG_B.shape[0], BIG_B.shape[0]))]
     ])
 
 
-    # STEP: costruzione precondizionatore
-    PRECOND_Axx = Create_Axx_Precond(A_xx, n)    # ritorna P_Ax
+    # Preconditioner construction
+    PRECOND_Axx = Create_Axx_Precond(A_xx, n)
     PRECOND_A_FULL = np.kron(np.eye(2), PRECOND_Axx)
     invPA = np.kron(np.eye(2), inv(PRECOND_Axx))
-
-    # PRECOND_B_FULL = Create_B_Precond(Bx, By, n)
-    # invB = pinv(BIG_B)
-    # invBT = pinv(BIG_B.T)
-    # invS = invBT @ PRECOND_A_FULL @ invB
-    # SCHUR_P = np.block([
-    #     [invPA, np.zeros((BIG_A.shape[0], invS.shape[1]))],
-    #     [np.zeros((invS.shape[0], BIG_A.shape[1])), invS]
-    # ])
 
     S = BIG_B @ invPA @ BIG_B.T
     PP = np.block([
@@ -77,28 +67,27 @@ if __name__ == "__main__":
         [np.zeros((S.shape[0], BIG_A.shape[1])), S]
     ])
     SCHUR_P = pinv(PP)
-    
-    # save("precond_test31_n32.npy", SCHUR_P)
-    # SCHUR_P = load('precond_test31_n32.npy')
+
+    # save("precond_test1_n32.npy", SCHUR_P)
+    # SCHUR_P = load('precond_test1_n32.npy')
+
+    # inv(P)*M clustering
+    sing = np.linalg.svd(np.matmul(SCHUR_P, SUPER_A), compute_uv=False)
+    xx = np.linspace(0,1,len(sing))
+
+    plt.figure(1)
+    plt.semilogy(xx[:-1], sing[:-1], 'x', color='red', label=r'$\sigma_j(S_n^{-1}M_n)$')
+    plt.axhline(y=1, color='black', linestyle='-')
+    plt.legend(fontsize=14)
+    plt.show()
 
 
-    # STEP: studio del clustering
-    # sing = np.linalg.svd(np.matmul(SCHUR_P, SUPER_A), compute_uv=False)
-    # xx = np.linspace(0,1,len(sing))
-
-    # plt.figure(1)
-    # plt.semilogy(xx, sing, 'x', color='red', markersize=3, label=r'$S_n^{-1}*A_n$')
-    # plt.axhline(y=1, color='black', linestyle='-', label='y=1')
-    # plt.legend(fontsize=12)
-    # plt.show()
-
-
-    # STEP: GMRES in this economy?
+    # GMRES test
     rhs = np.ones((SUPER_A.shape[0], 1))
     # rhs = CreateUniformSampling(SUPER_A.shape[0], n)
     # rhs = CreateRandomSampling(SUPER_A.shape[0], n)
     # rhs = loadtxt(f'test_n{n}.txt')
 
-    #sistemi precondizionati
+    # PGMRES test
     counter11 = krylov_counter()
     x, err11 = gmres(SUPER_A, rhs, M=SCHUR_P, callback=counter11)

@@ -1016,7 +1016,7 @@ def SuperSymbol(n:int, case:int, gamma:int) ->list[float]:
 
             for x in np.linspace(0,1,n):
                 for y in np.linspace(0,1,n):
-                    print(f"i = {i}\tj = {j}\tx = {x}\ty = {y}")
+                    # print(f"i = {i}\tj = {j}\tx = {x}\ty = {y}")
                     sym_Ax = AssembleSymbol_A(x,y,i,j,case,gamma)
 
                     # assembling the symbol
