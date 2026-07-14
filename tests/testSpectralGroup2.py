@@ -1,13 +1,8 @@
 '''
-Group 3: testing the adeherence of the eigenvalues of the full matrix 
+Group 2: testing the adeherence of the eigenvalues of the full matrix 
 against the spectral symbol.
 
-mu(x,y) = {
-    gamma   for (x,y) in (0,0.5)^2
-    1+x+y   otherwise
-}
-
-with gamma = 1, 10, 100.
+mu(x,y) = xy + exp(x+y)
 '''
 
 if __name__ == '__main__':
@@ -19,8 +14,7 @@ from src.StokesBuilder import *
 if __name__ == "__main__":
 
     n = 24                          # order of division
-    gamma = 10
-    coeffMu = CreateMu(n, 3, gamma) # viscosity coefficients
+    coeffMu = CreateMu(n, 2, 0)     # viscosity coefficients
 
 
     # Assembly of matrix A
@@ -48,13 +42,23 @@ if __name__ == "__main__":
     ])
 
     # Symbol's sampling
-    fullEigen = SuperSymbol(n, 3, gamma)
+    fullEigen = SuperSymbol(n, 2, 0)
+    fullEigenAxx = Symbol_Ax(n, 2, 0)
     xxe = np.linspace(0,1,len(fullEigen))
+    xxeAx = np.linspace(0,1,len(fullEigenAxx))
 
     sing, _ = eig(SUPER_A)
     xx = np.linspace(0,1,len(sing))
 
+    singAxx, _ = eig(A_xx)
+    yy = np.linspace(0,1,len(singAxx))
+
     plt.figure(1)
     plt.plot(xx, np.sort(sing, kind='heapsort'), '*', xxe, fullEigen)
     plt.legend([r'$\lambda_j(M_n)$', "$f(x,y,\\theta_1,\\theta_2)$"], fontsize=14)
+
+    plt.figure(2)
+    plt.plot(yy, np.sort(singAxx, kind='heapsort'), '*', xxe, fullEigen)
+    plt.legend([r'$\lambda_j(A_{x,n})$', "$f(x,y,\\theta_1,\\theta_2)$"], fontsize=14)
+
     plt.show()

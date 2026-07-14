@@ -1040,7 +1040,7 @@ def Symbol_Ax(n:int, case:int, gamma:int) ->list[float]:
         for j in np.linspace(-np.pi, np.pi, n):
             for x in np.linspace(0,1,n):
                 for y in np.linspace(0,1,n):
-                    print(f"i = {i}\tj = {j}\tx = {x}\ty = {y}")
+                    # print(f"i = {i}\tj = {j}\tx = {x}\ty = {y}")
                     eig_G, _ = eigh(AssembleSymbol_A(x,y,i,j,case,gamma))
                     fullEigen.extend(eig_G)
 
